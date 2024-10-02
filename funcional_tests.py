@@ -6,7 +6,7 @@ class NewVisitorTest(unittest.TestCase):
     def setUp(self):
         '''установка'''
         self.browser = webdriver.Chrome()
-    def tearDown(self):qq
+    def tearDown(self):
         '''демонтаж'''
         self.browser.quit()
     def test_can_start_a_list_and_retrieve_it_later(self):
