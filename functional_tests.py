@@ -1,21 +1,61 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 import time
+import unittest
 
 
+# service = Service(executable_path="/snap/bin/geckodriver")
 service = Service(
     executable_path="/home/neko/Documents/Projects/TDD/chromedriver-linux64/chromedriver"
 )
-driver = webdriver.Chrome(service=service)
-# service = Service(executable_path="/snap/bin/geckodriver")
+browser = webdriver.Chrome(service=service)
 
-# driver = webdriver.Firefox(service=service)
 
-# driver.get('https://google.com')
-driver.get("http://localhost:8000/")
-# driver.get("https://127.0.0.1:8000/")
+# time.sleep(10)
 
-# driver.get('https://ya.ru')
-time.sleep(10)
-driver.quit()
-assert 'Django' in driver.title
+class NewVisitorTest(unittest.TestCase):
+    """ Тест нового посетителя """
+    def setUp(self):
+        """Установка"""
+        self.browser = webdriver.Chrome(service=service)
+
+    def tearDown(self):
+        """ демонтаж """
+        self.browser.quit()
+
+    def test_can_start_a_list_and_retrieve_it_later(self):
+        """тест: можно начать список и получить его позже """
+        # Эдит слышала про крутое новое онлайн-приложение со
+        # списком неотложных дел. Она решает оценить его
+        # домашнюю страницу
+        self.browser.get('http://localhost:8000')
+
+        # Она видит, что заголовок и шапка страницы говорят о
+        # списках неотложных дел
+        self.assertIn('To-Do', self.browser.title)
+        self.fail('Закончить тест!')
+
+        # ей сразу же предлагается ввести элемент списка
+        # Она набирает в текстовом поле "Купить павлиньи перья" (ее хобби –
+        # вязание рыболовных мушек)
+
+        # Когда она нажимает enter, страница обновляется, и теперь страница
+        # содержит "1: Купить павлиньи перья" в качестве элемента списка
+
+        # Текстовое поле по-прежнему приглашает ее добавить еще один элемент.
+        # Она вводит "Сделать мушку из павлиньих перьев"
+        # (Эдит очень методична)
+
+        # Страница снова обновляется, и теперь показывает оба элемента ее списка
+
+        # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что
+        # сайт сгенерировал для нее уникальный URL-адрес – об этом
+        # выводится небольшой текст с объяснениями.
+        # Она посещает этот URL-адрес – ее список по-прежнему там.
+        # Удовлетворенная, она снова ложится спать
+        # browser.quit()
+
+if __name__ == '__main__':
+    unittest.main(warnings='ignore')
+    # unittest.main()
+    
