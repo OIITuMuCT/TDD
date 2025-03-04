@@ -53,7 +53,7 @@ class NewVisitorTest(unittest.TestCase):
         # выводится небольшой текст с объяснениями.
         # Она посещает этот URL-адрес – ее список по-прежнему там.
         # Удовлетворенная, она снова ложится спать
-        # browser.quit()
+        browser.quit()
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
