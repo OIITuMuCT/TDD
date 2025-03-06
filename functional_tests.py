@@ -1,6 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 import time
 import unittest
 
@@ -34,16 +35,17 @@ class NewVisitorTest(unittest.TestCase):
         # Она видит, что заголовок и шапка страницы говорят о
         # списках неотложных дел
         self.assertIn('To-Do', self.browser.title)
-        header_text = self.browser.find_element('id_new_item')
+        header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
+        self.assertIn('To-Do', header_text)
+
+        # ей сразу же предлагается ввести элемент списка
         self.assertEqual(
             inputbox.get_attribute('placeholder'),
             'Enter a to-do item'
         )
-        self.fail('Закончить тест!')
 
-        # ей сразу же предлагается ввести элемент списка
-        # Она набирает в текстовом поле "Купить павлиньи перья" (ее хобби –
-        # вязание рыболовных мушек)
+        # Она набирает в текстовом поле "Купить павлиньи перья" 
+        # (ее хобби – вязание рыболовных мушек)
         inputbox.send_keys('Купить павлиньи перья')
 
         # Когда она нажимает enter, страница обновляется, и теперь страница
@@ -51,15 +53,15 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
         
-        table = self.browser.find_element('id_list_table')
-        row = table.find_element('tr')
+        table = self.browser.find_element(By.ID, 'id_list_table')
+        rows = table.find_element(By.TAG_NAME, 'tr')
         self.assertTrue(
             any(row.text == '1: Купить павлиньи перья' for row in rows)
         )
         # Текстовое поле по-прежнему приглашает ее добавить еще один элемент.
         # Она вводит "Сделать мушку из павлиньих перьев"
         # (Эдит очень методична)
-
+        self.fail('Закончить тест!')
         # Страница снова обновляется, и теперь показывает оба элемента ее списка
 
         # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что
@@ -67,7 +69,7 @@ class NewVisitorTest(unittest.TestCase):
         # выводится небольшой текст с объяснениями.
         # Она посещает этот URL-адрес – ее список по-прежнему там.
         # Удовлетворенная, она снова ложится спать
-        browser.quit()
+        # browser.quit()
 
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
