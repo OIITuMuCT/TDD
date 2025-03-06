@@ -12,7 +12,7 @@ class HomePageTest(TestCase):
     def test_uses_home_template(self):
         """ тест: используется домашний шаблон """
         response = self.client.get('/')
-        self.assertTemplateNotUsed(response, 'home.html')
+        self.assertTemplateUsed(response, 'home.html')
     def test_root_url_resolves_to_home_page_view(self):
         """ тест: корневой url преобразуется в представление
         домашней страницы"""
