@@ -121,7 +121,7 @@ class NewVisitorTest(LiveServerTestCase):
         
         # Текстовое поле по-прежнему приглашает ее добавить еще один элемент.
         # Она вводит "Сделать мушку из павлиньих перьев" (Эдит очень методична)
-        self.fail('Закончить тест!')
+        # self.fail('Закончить тест!')
         # Страница снова обновляется, и теперь показывает оба элемента ее списка
 
         # Эдит интересно, запомнит ли сайт ее список. Далее она видит, что
@@ -131,6 +131,31 @@ class NewVisitorTest(LiveServerTestCase):
         # Удовлетворенная, она снова ложится спать
         # browser.quit()
 
+    def test_layout_and_styling(self):
+        """ тест макета и стилевого оформления """
+        # Эдит открывает домашнюю страницу
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+        
+        # Она замечает, что поле ввода аккуратно центрировано
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
+        # Она начинает новый список и видит, что поле ввода там тоже 
+        # аккуратно центрировано
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element(By.ID, 'id_new_item')
+        self.assertAlmostEqual(
+            inputbox.location['x'] + inputbox.size['width'] / 2,
+            512,
+            delta=10
+        )
+        
 # if __name__ == '__main__':
 #     unittest.main(warnings='ignore')
 #     # unittest.main()
