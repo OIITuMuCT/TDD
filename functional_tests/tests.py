@@ -115,7 +115,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Опять-таки, нет ни следа от списка Эдит
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
         self.assertNotIn('Купить павлиньи перья', page_text)
-        self.assertIn('Купить молоко')
+        self.assertIn('Купить молоко', page_text)
         
         # Удовлетворенные, они оба ложатся спать
         
