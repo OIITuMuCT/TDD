@@ -18,4 +18,4 @@ class ItemFormTest(TestCase):
         self.assertEqual(
             form.errors['text'], [EMPTY_ITEM_ERROR]
         )
-        # form.save()
+
