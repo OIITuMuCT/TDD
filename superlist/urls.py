@@ -26,5 +26,3 @@ urlpatterns = [
     re_path(r"^$", list_views.home_page, name="home"),
     re_path(r"^lists/", include(list_urls)),
 ]
-
-
