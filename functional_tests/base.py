@@ -1,14 +1,16 @@
+from unittest import skip
 from selenium.common.exceptions import WebDriverException
-from django.test import LiveServerTestCase
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
+import os
 
 
 MAX_WAIT = 10
+
 
 # service = Service(executable_path="/snap/bin/geckodriver")
 service = Service(
@@ -16,16 +18,21 @@ service = Service(
 )
 browser = webdriver.Chrome(service=service)
 
-
-class NewVisitorTest(StaticLiveServerTestCase):
-    """ Тест нового посетителя """
+class FunctionalTest(StaticLiveServerTestCase):
+    """
+    Функциональный тест
+    """
     def setUp(self):
         """Установка"""
         self.browser = webdriver.Chrome(service=service)
+        staging_server = os.environ.get('STAGING_SERVER')
+        if staging_server:
+            self.live_server_url = 'http://' + staging_server
 
     def tearDown(self):
         """ демонтаж """
         self.browser.quit()
+
     def wait_for_row_in_list_table(self, row_text):
         """ ожидать строку в таблице списка """
         start_time = time.time()
@@ -39,6 +46,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
                 if time.time() - start_time > MAX_WAIT:
                     raise e
                 time.sleep(0.5)
+
+
+class NewVisitorTest(FunctionalTest):
+    """ Тест нового посетителя """
 
     def test_can_start_a_list_one_user(self):
         """ тест: можно начать список для одного пользователя """
@@ -132,6 +143,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # Удовлетворенная, она снова ложится спать
         # browser.quit()
 
+class LayoutAndStylingTest(FunctionalTest):
+    """ тест макета и стилевого оформления """
+
     def test_layout_and_styling(self):
         """ тест макета и стилевого оформления """
         # Эдит открывает домашнюю страницу
@@ -142,7 +156,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
+            310,
             delta=10
         )
         # Она начинает новый список и видит, что поле ввода там тоже 
@@ -153,10 +167,32 @@ class NewVisitorTest(StaticLiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
+            310,
             delta=10
         )
-        
+
+class ItemValidationTest(FunctionalTest):
+    """ тест валидации элемента списка """
+
+    @skip
+    def test_cannot_add_empty_list_items(self):
+        """ тест: нельзя добавлять пустые элементы списка"""
+        # Эдит открывает домашнюю страницу и случайно пытается отправить 
+        # пустой элемент списка. Она нажимает Enter на пустом поле ввода
+
+        # Домашняя страница обновляется, и появляется сообщение об ошибке, 
+        # которое говорит, что элементы списка не должны быть пустыми
+
+        # Она пробует снова, теперь с неким текстом для элемента, и теперь 
+        # это срабатывает
+
+        # Как ни странно, Эдит решает отправить второй пустой элемент списка
+        # Она получает аналогичное предупреждение на странице списка
+
+        # И она может его исправить, заполнив поле неким текстом
+        self.fail('Напиши меня!')
+
+
 # if __name__ == '__main__':
 #     unittest.main(warnings='ignore')
 #     # unittest.main()
