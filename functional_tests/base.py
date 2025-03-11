@@ -5,6 +5,8 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+
+import unittest
 import time
 import os
 
@@ -62,4 +64,6 @@ class FunctionalTest(StaticLiveServerTestCase):
     def get_item_input_box(self):
         """ получить поле ввода для элемента """
         return self.browser.find_element(By.ID, 'id_text')
-    
+
+# if __name__ == '__main__':
+#     unittest.main(warnings='ignore')

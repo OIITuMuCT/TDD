@@ -1,8 +1,11 @@
 from django.utils.html import escape
 from django.test import TestCase
-
+from unittest import skip
 from lists.models import Item, List
-from lists.forms import ItemForm, EMPTY_ITEM_ERROR
+from lists.forms import (
+    ItemForm, EMPTY_ITEM_ERROR, 
+    DUPLICATE_ITEM_ERROR, ExistingListItemForm
+    )
 
 # Create your tests here.
 
@@ -124,6 +127,22 @@ class ListViewTest(TestCase):
         response = self.post_invalid_input()
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
+    @skip
+    def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
+        """ тест: ошибки валидации повторяющегося элемента 
+        оканчиваются на странице списков """
+        list1 = List.objects.create()
+        item1 = Item.objects.create(list=list1, text='textey')
+        response = self.client.post(
+            f'/lists/{list1.id}/',
+            data = {'text': 'textey'}
+        )
+        expected_error = escape("You've already got this in your list")
+        self.assertContains(response, expected_error)
+        self.assertTemplateUsed(response, 'list.html')
+        self.assertEqual(Item.objects.all().count(), 1)
+
+
 class NewListTest(TestCase):
     """ тест нового списка """
     def test_can_save_a_POST_request(self):
@@ -170,3 +189,26 @@ class NewListTest(TestCase):
         """тест: на недопустимый ввод: форма передается в шаблон"""
         response = self.client.post("/lists/new", data={"text": ""})
         self.assertIsInstance(response.context["form"], ItemForm)
+
+class ExistingListItemFormTest(TestCase):
+    """ тест формы элемента существующего списка """
+    def test_form_renders_item_text_input(self):
+        """ тест: форма отображает текстовый ввод элемента """
+        list_ = List.objects.create()
+        form = ExistingListItemForm(for_list=list_)
+        self.assertIn('placeholder="Enter a to-do item"', form.as_p())
+
+    def test_form_validation_blank_items(self):
+        """ тест: валидации формы для пустых элементов """
+        list_ = List.objects.create()
+        form = ExistingListItemForm(for_list=list_, data={'text': ''})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['text'], [EMPTY_ITEM_ERROR])
+
+    def test_validation_for_duplicate_items(self):
+        """ тест: валидация формы для повторных элементов """
+        list_ = List.objects.create()
+        Item.objects.create(list=list_, text='no twins!')
+        form = ExistingListItemForm(for_list=list_, data={'text': 'no twins!'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['text'], [DUPLICATE_ITEM_ERROR])
