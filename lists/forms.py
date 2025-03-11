@@ -18,3 +18,9 @@ class ItemForm(forms.ModelForm):
         error_messages = {
             'text': {'required': EMPTY_ITEM_ERROR}
         }
+    # метод save избавляет от ошибки 
+    # TypeError: save() got an unexpected keyword argument 'for_list'
+    def save(self, for_list):
+        self.instance.list = for_list
+        return super().save()
+    
