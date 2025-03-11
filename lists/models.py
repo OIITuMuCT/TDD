@@ -8,6 +8,8 @@ class List(models.Model):
         """ получить абсолютный url """
         return reverse('view_list', args=[self.id])
 
+    def __str__(self):
+        return List.__name__
 class Item(models.Model):
     """ элемент списка """
     class Meta:
