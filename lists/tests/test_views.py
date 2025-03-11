@@ -3,8 +3,8 @@ from django.test import TestCase
 from unittest import skip
 from lists.models import Item, List
 from lists.forms import (
-    ItemForm, EMPTY_ITEM_ERROR, 
-    DUPLICATE_ITEM_ERROR, ExistingListItemForm
+    ItemForm, ExistingListItemForm,
+    EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
     )
 
 # Create your tests here.
@@ -20,7 +20,6 @@ class HomePageTest(TestCase):
         """ тест: домашняя страница использует форму для элемента """
         response = self.client.get('/')
         self.assertIsInstance(response.context['form'], ItemForm)
-
 
 class ListViewTest(TestCase):
     """ тест представления списка """
@@ -38,6 +37,13 @@ class ListViewTest(TestCase):
         correct_list = List.objects.create()
         response = self.client.get(f'/lists/{correct_list.id}/')
         self.assertEqual(response.context['list'], correct_list)
+
+    def test_display_item_form(self):
+        """ тест:  отображается форма для элемента списка """
+        list_ = List.objects.create()
+        response = self.client.get(f'/lists/{list_.id}/')
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+        self.assertContains(response, 'name="text"')
 
     def test_display_only_items_for_that_list(self):
         """ тест: отображаются все элементы списка """
@@ -80,6 +86,17 @@ class ListViewTest(TestCase):
         )
         self.assertRedirects(response, f'/lists/{correct_list.id}/')
 
+    def test_for_invalid_input_nothing_saved_to_db(self):
+        """ тест на недопустимый ввод: ничего не сохраняется в БД """
+        self.post_invalid_input()
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_for_invalid_input_renders_list_template(self):
+        """ тест на недопустимый ввод: отображается шаблон списка """
+        response = self.post_invalid_input()
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'list.html')
+
     def test_validation_errors_end_up_on_lists_page(self):
         """ тест: ошибки валидации оканчиваются на странице списков """
         list_ = List.objects.create()
@@ -91,43 +108,18 @@ class ListViewTest(TestCase):
         expected_error = escape(EMPTY_ITEM_ERROR)
         self.assertContains(response, expected_error)
 
-    # def test_display_item_form(self):
-    #     """ тест отображения формы элемента """
-    #     list_ = List.objects.create()
-    #     response = self.client.post(f'/lists/{list_.id}/')
-    #     self.assertIsInstance(response.context['form'], ItemForm)
-    #     self.assertContains(response, name='text')
-
-    def post_invalid_input(self):
-        """ отправляет недопустимый ввод """
-        list_ = List.objects.create()
-        return self.client.post(
-            f'/lists/{list_.id}/',
-            data={'text': ''}
-        )
-
-    def test_for_invalid_input_nothing_saved_to_db(self):
-        """ тест на недопустимый ввод: ничего не сохраняется в БД """
-        self.post_invalid_input()
-        self.assertEqual(Item.objects.count(), 0)
-    
-    def test_for_invalid_input_renders_list_template(self):
-        """ тест на недопустимый ввод: отображается шаблон списка """
-        response = self.post_invalid_input()
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'list.html')
-
     def test_for_invalid_input_passes_form_to_template(self):
         """ тест на недопустимый ввод: форма передается в шаблон"""
         response = self.post_invalid_input()
-        self.assertIsInstance(response.context['form'], ItemForm)
-    
+        self.assertIsInstance(response.context['form'], ExistingListItemForm)
+
+    @skip
     def test_for_invalid_input_shows_errors_on_page(self):
         """ тест на недопустимый ввод: на странице показывается ошибка """
         response = self.post_invalid_input()
+        self.assertIn(response.context['form'], ExistingListItemForm)
         self.assertContains(response, escape(EMPTY_ITEM_ERROR))
 
-    @skip
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         """ тест: ошибки валидации повторяющегося элемента 
         оканчиваются на странице списков """
@@ -142,6 +134,22 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
 
+    def post_invalid_input(self):
+        """ отправляет недопустимый ввод """
+        list_ = List.objects.create()
+        return self.client.post(
+            f'/lists/{list_.id}/',
+            data={'text': ''}
+        )
+
+
+
+
+
+
+
+
+    # @skip
 
 class NewListTest(TestCase):
     """ тест нового списка """

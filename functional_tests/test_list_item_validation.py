@@ -4,6 +4,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 
+from lists.forms import DUPLICATE_ITEM_ERROR
 # service = Service(executable_path="/snap/bin/geckodriver")
 service = Service(
     executable_path="/home/neko/Documents/Projects/TDD/chromedriver-linux64/chromedriver"
@@ -64,5 +65,5 @@ class ItemValidationTest(FunctionalTest):
         # Она видит полезное сообщение об ошибке
         self.wait_for(lambda: self.assertEqual(
             self.browser.find_element(By.CSS_SELECTOR, '.has-error').text,
-            "You've already got this in your list"
+            DUPLICATE_ITEM_ERROR
         ))
