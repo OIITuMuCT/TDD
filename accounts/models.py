@@ -1,6 +1,10 @@
-from django.db import models
 import uuid
+
+from django.contrib import auth
+from django.db import models
+
 # Create your models here.
+auth.signals.user_logged_in.disconnect(auth.models.update_last_login)
 
 class User(models.Model):
     """ пользователь """
