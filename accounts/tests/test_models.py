@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from accounts.models import Token
 from django.contrib import auth
 
-User = auth.get_user_model()
+User = get_user_model()
 
 class UserModelTest(TestCase):
     """ тест модели пользователя """

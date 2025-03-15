@@ -15,24 +15,12 @@ from accounts.models import Token
 
 def send_login_email(request):
     '''отправить сообщение для входа в систему'''
-    email = request.POST['email']
-    uid = str(uuid.uuid4())
+    email = request.POST["email"]
     token = Token.objects.create(email=email)
-    print('saving uid', uid, 'for email', email, file=sys.stderr)
-    # url = request.build_absolute_uri(
-    #     f'/accounts/login?=uid={uid}'
-    # )
-    url = request.build_absolute_uri(
-        reverse('login') + '?token=' + str(token.uid)
-    )
-    print(type(send_mail))
+    url = request.build_absolute_uri(reverse("login") + "?token=" + str(token.uid))
     message_body = f"Use this link to log in:\n\n{url}"
-
     send_mail(
-    'Your login link for Superlists',
-    message_body,
-    'noreply@superlists',
-    [email],
+        "Your login link for Superlists", message_body, "noreply@superlists", [email]
     )
     messages.success(
         request,
@@ -46,7 +34,6 @@ def send_login_email(request):
 def login(request):
     """зарегистрировать вход в систему"""
     print('login view', file=sys.stderr)
-    uid = request.GET.get('uid')
     # user = auth.authenticate(uid=uid)
     user = auth.authenticate(uid=request.GET.get("token"))
 
