@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,6 +43,9 @@ INSTALLED_APPS = [
     "accounts",
 ]
 AUTH_USER_MODEL = 'accounts.User'
+AUTHENTICATION_BACKENDS = [
+    "accounts.authentication.PasswordlessAuthenticationBackend",
+]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -127,10 +131,9 @@ STATIC_ROOT = os.path.abspath(os.path.join(BASE_DIR, '../static'))
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # EMAIL settings
-
-# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_BACKEND = ("django.core.mail.backends.console.EmailBackend",)
 
+# EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 # EMAIL_HOST = "smtp.gmail.com"
 # EMAIL_HOST_USER = "vatamancorp@gmail.com"
 # EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD")
